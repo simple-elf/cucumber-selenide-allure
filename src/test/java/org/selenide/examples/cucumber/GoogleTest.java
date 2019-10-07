@@ -1,21 +1,13 @@
 package org.selenide.examples.cucumber;
 
-import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.junit.TextReport;
-import cucumber.api.junit.Cucumber;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
+import io.cucumber.junit.Cucumber;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
+//@CucumberOptions(format = {"pretty", "html:target/Cucumber_report"})
 public class GoogleTest {
-  @Rule
-  public TestRule report = new TextReport().onFailedTest(true).onSucceededTest(true);
+  //@Rule
+  //public TestRule report = new TextReport().onFailedTest(false).onSucceededTest(false);
 
-  @Before
-  public void setUp() {
-    Configuration.startMaximized = false;
-    Configuration.reportsFolder = "target/surefire-reports";
-  }
+
 }
