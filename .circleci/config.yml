@@ -1,0 +1,59 @@
+version: 2.0
+
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch-browsers
+        environment:
+          MAVEN_OPTS: -Xmx1024m
+    working_directory: ~/project/
+    steps:
+    - checkout:
+        path: ~/project
+    - run:
+        name: Browsers versions
+        command: |
+          chromedriver --version
+          google-chrome --version
+          geckodriver --version
+          firefox --version
+    - restore_cache:
+        keys:
+          - $CIRCLE_PROJECT_REPONAME-{{ checksum "pom.xml" }}
+          - $CIRCLE_PROJECT_REPONAME-
+
+    - run:
+        name: Resolve Maven dependencies
+        command: mvn dependency:go-offline compile compiler:testCompile
+    - run:
+        name: Autotests
+        command: mvn test
+
+    - run:
+        name: Allure Report
+        command: mvn allure:report
+        when: always
+
+    - save_cache:
+        paths:
+          - ~/.m2
+          - .allure
+        key: $CIRCLE_PROJECT_REPONAME-{{ checksum "pom.xml" }}
+        when: always
+    - store_test_results:
+        path: target/surefire-reports
+    - store_artifacts:
+        path: target/surefire-reports
+        #destination: report/testng-results
+    - store_artifacts:
+        path: target/allure-results
+        #destination: report/allure-results
+    - store_artifacts:
+        path: target/site/allure-maven-plugin
+        destination: Allure
+
+workflows:
+  version: 2
+  autotests_and_report:
+    jobs:
+      - build
